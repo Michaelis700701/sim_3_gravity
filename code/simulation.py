@@ -7,10 +7,10 @@ from context_menu.context_menu import ContextMenu
 class Simulation():
     def __init__(self) -> None:
         self.display_surface = pygame.display.get_surface()
-        self.surface = pygame.display.get_surface() #pygame.Surface((WINDOW_WIDTH * 3, WINDOW_HEIGHT * 3)).convert_alpha()
+        self.surface = pygame.Surface((WINDOW_WIDTH * 3, WINDOW_HEIGHT * 3)).convert_alpha()
     
         self.origin = vector(0, 0)
-        self.zoom = 0.5
+        self.zoom = 1
         self.context_menu = None
 
         #masses.extend([Mass(vector(450, 250), 50, centered=True), Mass(vector(650, 150), 15, vector(1.3, 2.2)), Mass(vector(350, 350), 15, vector(2.3, 1.5))])
@@ -53,6 +53,10 @@ class Simulation():
         if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     self.context_menu = None
+                if event.key == pygame.K_MINUS and self.zoom > 0.5:
+                    self.zoom -= 0.1
+                if event.key == pygame.K_EQUALS and self.zoom < 2:
+                    self.zoom += 0.1
             #elif event.key == pygame.K_ESCAPE:
                 #ACTIVE_STATE['active_state'] = 'main_menu'
 
@@ -84,7 +88,7 @@ class Simulation():
                 elif output == ['Create Orbital']:
                     masses.append(Mass(
                         self.surface,
-                        (self.context_menu.position - self.origin),
+                        (self.context_menu.position - self.origin) / self.zoom,
                         self.create_orbital_radius,
                         self.create_orbital_velocity,
                         self.create_orbital_centered))
@@ -103,8 +107,8 @@ class Simulation():
         self.center()
     
     def draw_tile_lines(self) -> None:
-        columns = int(WINDOW_WIDTH // TILE_SIZE)
-        rows = int(WINDOW_HEIGHT // TILE_SIZE)
+        columns = int(WINDOW_WIDTH // TILE_SIZE / self.zoom)
+        rows = int(WINDOW_HEIGHT // TILE_SIZE / self.zoom)
         
         origin_offset = vector(
             x = self.origin.x - int(self.origin.x / TILE_SIZE) * TILE_SIZE,
@@ -115,10 +119,10 @@ class Simulation():
 
         for column in range(columns + 2) :
             x = origin_offset.x + column * TILE_SIZE
-            pygame.draw.line(support_lines_surface, LINE_COLOR, (x, 0), (x, WINDOW_HEIGHT), 2)
+            pygame.draw.line(support_lines_surface, LINE_COLOR, (x, 0), (x, WINDOW_HEIGHT / self.zoom), 2)
         for row in range(rows + 2):
             y = origin_offset.y + row * TILE_SIZE
-            pygame.draw.line(support_lines_surface, LINE_COLOR, (0, y), (WINDOW_WIDTH, y), 2)
+            pygame.draw.line(support_lines_surface, LINE_COLOR, (0, y), (WINDOW_WIDTH / self.zoom, y), 2)
         
         self.surface.blit(support_lines_surface, (0,0))
 
@@ -133,7 +137,8 @@ class Simulation():
 
         pygame.draw.circle(self.surface, (250, 0, 0), self.origin, 10)
 
-        self.display_surface.blit(self.surface, vector(0, 0))
+        zoomed_screen = pygame.transform.smoothscale_by(self.surface, self.zoom)
+        self.display_surface.blit(zoomed_screen, vector(0, 0))
             #pygame.transform.scale(self.surface, (WINDOW_WIDTH * self.zoom, WINDOW_HEIGHT * self.zoom)), vector(0, 0))
         
         if self.context_menu != None:
