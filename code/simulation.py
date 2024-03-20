@@ -35,7 +35,7 @@ class Simulation():
     def center(self) -> None:
         for mass in masses:
             if mass.centered:
-                self.origin = ((vector(0, 0) - mass.position) + vector(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2))
+                self.origin = ((vector(0, 0) - mass.position) + vector((WINDOW_WIDTH / self.zoom) / 2, (WINDOW_HEIGHT / self.zoom) / 2))
                 continue
 
     def manage_window(self, event) -> None:
@@ -85,10 +85,18 @@ class Simulation():
                     self.create_orbital_velocity = self.context_menu.active_context_menu.return_vector()
                 elif output == ['Centered', 'True']:
                     self.create_orbital_centered = True
-                elif output == ['Create Orbital']:
+                elif output == ['Create Orbital', 'Create']:
                     masses.append(Mass(
                         self.surface,
-                        (self.context_menu.position - self.origin) / self.zoom,
+                        ((self.context_menu.position / self.zoom) - self.origin),
+                        self.create_orbital_radius,
+                        self.create_orbital_velocity,
+                        self.create_orbital_centered))
+                    self.context_menu = None
+                elif output == ['Create Orbital', 'Create with Orbit']:
+                    masses.append(Mass(
+                        self.surface,
+                        ((self.context_menu.position / self.zoom) - self.origin),
                         self.create_orbital_radius,
                         self.create_orbital_velocity,
                         self.create_orbital_centered))
