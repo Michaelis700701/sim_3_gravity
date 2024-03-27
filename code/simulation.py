@@ -13,6 +13,8 @@ class Simulation():
         self.zoom = 1
         self.context_menu = None
 
+        self.active_context_menu = None
+
         #masses.extend([Mass(vector(450, 250), 50, centered=True), Mass(vector(650, 150), 15, vector(1.3, 2.2)), Mass(vector(350, 350), 15, vector(2.3, 1.5))])
 
     def update_keys_pressed(self, event) -> None:
@@ -69,7 +71,7 @@ class Simulation():
                 self.display_surface,
                 [
                     ['Mass', 'radius_input'],
-                    ['Set Velocity', 'vector_input'],
+                    ['Set Velocity', ['Vector Input', 'vector_input'], 'Orbit around Clicked', 'Back'],
                     ['Centered', 'True', 'False', 'Back'],
                     'Create Orbital'
                 ], 15)
@@ -85,7 +87,7 @@ class Simulation():
                     self.create_orbital_velocity = self.context_menu.active_context_menu.return_vector()
                 elif output == ['Centered', 'True']:
                     self.create_orbital_centered = True
-                elif output == ['Create Orbital', 'Create']:
+                elif output == ['Create Orbital']:
                     masses.append(Mass(
                         self.surface,
                         ((self.context_menu.position / self.zoom) - self.origin),

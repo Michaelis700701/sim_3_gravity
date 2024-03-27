@@ -154,8 +154,12 @@ class ContextMenu():
         output = []
 
         if self.active_context_menu != self:
-            output.append(self.return_text)
-            output.append(self.active_context_menu.return_text)
+            if not self.active_context_menu.active_context_menu == None:
+                output.append(self.return_text)
+                output.extend(self.active_context_menu.read_output())
+            else:
+                output.append(self.return_text)
+                output.append(self.active_context_menu.return_text)
         else:
             output.append(self.return_text)
 
@@ -173,3 +177,6 @@ class ContextMenu():
     def update(self) -> None:
         
         self.__pick_option()
+
+        #if self.pre_selected_option != None:
+            #self.pre_selected_option.active_context_menu = self.active_context_menu

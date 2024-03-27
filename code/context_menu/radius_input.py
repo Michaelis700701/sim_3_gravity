@@ -28,6 +28,7 @@ class RadiusInput():
         self.click = False
         self.pre_click = False
 
+        self.active_context_menu = None
 
         self.input_rect = pygame.Rect(
             self.position.x + self.margin,
