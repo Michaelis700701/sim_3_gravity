@@ -1,4 +1,4 @@
-import pygame, sys
+import pygame, math, sys
 from pygame.math import Vector2 as vector
 from settings import *
 from mass import Mass
@@ -83,8 +83,17 @@ class Simulation():
             if output[-1] != None:
                 if output == ['Mass', 'Return']:
                     self.create_orbital_radius = self.context_menu.active_context_menu.return_radius()
-                elif output == ['Set Velocity', 'Return']:
-                    self.create_orbital_velocity = self.context_menu.active_context_menu.return_vector()
+                elif output == ['Set Velocity', 'Vector Input', 'Return']:
+                    self.create_orbital_velocity = self.context_menu.active_context_menu.active_context_menu.return_vector()
+                elif output == ['Set Velocity', 'Orbit around Clicked']:
+                    vector_distance = ((self.context_menu.position / self.zoom) - self.origin) - masses[0].position
+                    distance = math.sqrt(vector_distance.x ** 2 + vector_distance.y ** 2)
+                    mass = math.pi * (self.create_orbital_radius ** 2) * MASS_AREA_RATIO
+                    force = G * ((mass * masses[0].mass) / (distance ** 2))
+                    acceleration = force / mass
+                    angle = math.atan2(masses[0].position.y - ((self.context_menu.position / self.zoom) - self.origin).y, masses[0].position.x - ((self.context_menu.position / self.zoom) - self.origin).x) + 1.5708
+                    self.create_orbital_velocity = vector(math.cos(angle) * acceleration, math.sin(angle) * acceleration)
+                    print(self.create_orbital_velocity)
                 elif output == ['Centered', 'True']:
                     self.create_orbital_centered = True
                 elif output == ['Create Orbital']:
@@ -95,14 +104,7 @@ class Simulation():
                         self.create_orbital_velocity,
                         self.create_orbital_centered))
                     self.context_menu = None
-                elif output == ['Create Orbital', 'Create with Orbit']:
-                    masses.append(Mass(
-                        self.surface,
-                        ((self.context_menu.position / self.zoom) - self.origin),
-                        self.create_orbital_radius,
-                        self.create_orbital_velocity,
-                        self.create_orbital_centered))
-                    self.context_menu = None
+                    print(self.create_orbital_velocity)
 
     def event_loop(self) -> None:
         for event in pygame.event.get():
@@ -163,5 +165,7 @@ class Simulation():
                 mass.update()
         else:
             self.context_menu.active_context_menu.update()
+            print(self.context_menu.active_context_menu)
             
         self.draw()
+        print(masses)

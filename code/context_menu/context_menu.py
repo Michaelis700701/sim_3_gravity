@@ -167,16 +167,22 @@ class ContextMenu():
 
     def draw(self) -> None:
 
-        self.surface.fill((255, 255, 255))
-        self.__draw_selected_option()
-        self.surface.blit(self.text_surface, vector(0, 0))
-        self.__draw_border(width=2)
+        if self.active_context_menu == self:
+            self.surface.fill((255, 255, 255))
+            self.__draw_selected_option()
+            self.surface.blit(self.text_surface, vector(0, 0))
+            self.__draw_border(width=2)
 
-        self.display_surface.blit(self.surface, self.rect)
+            self.display_surface.blit(self.surface, self.rect)
+        else:
+            self.active_context_menu.draw()
 
     def update(self) -> None:
         
-        self.__pick_option()
+        if self.active_context_menu == self:
+            self.__pick_option()
+        else:
+            self.active_context_menu.update()
 
         #if self.pre_selected_option != None:
             #self.pre_selected_option.active_context_menu = self.active_context_menu
